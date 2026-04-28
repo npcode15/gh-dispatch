@@ -1,0 +1,31 @@
+name            = "gh-dispatch"
+main            = "src/index.ts"
+compatibility_date = "2024-09-23"
+
+# ── Cron schedule ────────────────────────────────────────────────────────────
+# Cloudflare day-of-week: 1=Sun  2=Mon  3=Tue  4=Wed  5=Thu  6=Fri  7=Sat
+# Mon–Fri = 2-6  (NOT 1-5 like standard cron)
+#
+# Two fetch windows per US trading day:
+#   9:35 AM ET  = 13:35 UTC (EDT / summer)  or  14:35 UTC (EST / winter)
+#   3:00 PM ET  = 19:00 UTC (EDT / summer)  or  20:00 UTC (EST / winter)
+# Both EDT and EST slots are scheduled; the off-season one is a harmless no-op.
+[triggers]
+crons = [
+  "35 13 * * 2-6",   # 9:35 AM EDT  (Mon–Fri)
+  "35 14 * * 2-6",   # 9:35 AM EST  (Mon–Fri)
+  "0  19 * * 2-6",   # 3:00 PM EDT  (Mon–Fri)
+  "0  20 * * 2-6",   # 3:00 PM EST  (Mon–Fri)
+]
+
+# ── Environment variables (non-secret) ───────────────────────────────────────
+# Override per environment below if needed.
+[vars]
+GITHUB_OWNER  = "npcode15"
+GITHUB_REPO   = "trading-radar"
+WORKFLOW_FILE = "data_update.yml"
+REF           = "main"
+
+# ── GITHUB_TOKEN is a secret — set it with: ──────────────────────────────────
+#   wrangler secret put GITHUB_TOKEN
+# Never commit the token here.
